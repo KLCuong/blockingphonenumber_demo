@@ -1,12 +1,10 @@
 package com.example.idontknowwhattocallit;
 
 import android.Manifest;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -16,6 +14,8 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+
+import com.example.idontknowwhattocallit.Callog.Call_Log;
 
 import java.util.ArrayList;
 import java.util.Map;
@@ -98,7 +98,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         textView = findViewById(R.id.textView);
         button = findViewById(R.id.button);
         historybtn = findViewById(R.id.history);
-        btn3 = findViewById(R.id.button4);
+        btn3 = findViewById(R.id.call_log);
         button2 = findViewById(R.id.button2);
         editText.setText("");
         getData();
@@ -169,7 +169,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             startActivity(intent);
         }else if(id == R.id.button2){
             unblockNumber();
-        }else{
+        }else if(id == R.id.call_log){
+            Intent intent = new Intent(this, Call_Log.class);
+            startActivity(intent);
+        } else{
             finishAffinity();
         }
 
