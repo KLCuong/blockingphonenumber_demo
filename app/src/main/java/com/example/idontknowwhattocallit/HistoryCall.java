@@ -1,7 +1,9 @@
 package com.example.idontknowwhattocallit;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -23,10 +25,14 @@ public class HistoryCall extends AppCompatActivity {
     ArrayAdapter<String> arrayAdapter;
     ArrayList<String> arrayList;
     Button btnback;
+    Context context;
+    SharedPreferences prfs;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.historycontact);
+        context = this;
+        prfs = getSharedPreferences("number", MODE_PRIVATE);
         listView = findViewById(R.id.history_lv);
         btnback = (Button)findViewById (R.id.Backbtn);
         btnback.setOnClickListener(v -> {
@@ -68,7 +74,7 @@ public class HistoryCall extends AppCompatActivity {
                         CalltypeString = "Missed";
                         break;
                     case CallLog.Calls.REJECTED_TYPE:
-                        CalltypeString = "Rejected";
+                        CalltypeString = rejectbyblock(number);
                         break;
                     case CallLog.Calls.BLOCKED_TYPE:
                         CalltypeString = "Blocked";
@@ -87,5 +93,11 @@ public class HistoryCall extends AppCompatActivity {
         }
         arrayAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, arrayList);
         listView.setAdapter(arrayAdapter);
+    }
+
+    private String rejectbyblock(String number) {
+        if(prfs.contains(number)){
+            return "Rejected by blocklist";
+        }else return "Rejected";
     }
 }

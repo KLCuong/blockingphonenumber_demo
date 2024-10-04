@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <style name="Theme.bro" parent = "Theme.AppCompat.Light"/>
+    <style name="Theme.nobar" parent = "Theme.AppCompat.NoActionBar"/>
     <style name="Theme.IDontKnowWhatToCallIt" parent="android:Theme.Material.Light.NoActionBar" />
 </resources>

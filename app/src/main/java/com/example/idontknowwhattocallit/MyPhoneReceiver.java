@@ -6,12 +6,18 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.telecom.TelecomManager;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.widget.Toast;
+
+import androidx.annotation.RequiresApi;
+import androidx.core.app.ActivityCompat;
 
 import com.example.idontknowwhattocallit.support.BlockListCheck;
 import com.example.idontknowwhattocallit.telephony.ITelephony;
@@ -25,7 +31,7 @@ public class MyPhoneReceiver extends BroadcastReceiver {
     SharedPreferences prfs;
     Map<String, ?> map;
     ArrayList<String> numblocks;
-
+    private ITelephony telephonyService;
     @Override
     public void onReceive(Context context, Intent intent) {
         this.context = context;
@@ -35,12 +41,13 @@ public class MyPhoneReceiver extends BroadcastReceiver {
 
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.P)
     private void processCall(Context context, Intent intent) {
         String state = intent.getStringExtra(TelephonyManager.EXTRA_STATE);
         if(state.equals(TelephonyManager.EXTRA_STATE_RINGING)){
             // Hiển thị Toast trên luồng chính
-            new Handler(Looper.getMainLooper()).post(() ->
-                    Toast.makeText(context, "Call incoming", Toast.LENGTH_SHORT).show());
+            /*new Handler(Looper.getMainLooper()).post(() ->
+                    Toast.makeText(context, "Call incoming", Toast.LENGTH_SHORT).show());*/
 
             String incomingnumber = intent.getStringExtra(TelephonyManager.EXTRA_INCOMING_NUMBER);
 
@@ -73,25 +80,55 @@ public class MyPhoneReceiver extends BroadcastReceiver {
         }
     }
 
-    private void rejectCall(Context context,String incomingnumber) {
-        TelephonyManager tm = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
+    @RequiresApi(api = Build.VERSION_CODES.P)
+    private void rejectCall(Context context, String incomingnumber) {
+        // Get the TelephonyManager instance
+
+        /*TelephonyManager tm = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
         try {
+            // Get the class object of TelephonyManager
             Class<?> c = Class.forName(tm.getClass().getName());
+
+            // Access the hidden method "getITelephony" using reflection
             Method m = c.getDeclaredMethod("getITelephony");
+
+            // Make the method accessible as it's not public
             m.setAccessible(true);
-            ITelephony telephonyService = (ITelephony) m.invoke(tm);
 
+            // Invoke the method to get the ITelephony instance
+            telephonyService = (ITelephony) m.invoke(tm);
 
-            // Ghi lại số điện thoại vào log
-            Log.d("INCOMING", incomingnumber);
+            // Get the incoming number from the intent
 
-            // Kết thúc cuộc gọi mà không cần kiểm tra phoneNumber có null hay không
+            String phoneNumber = incomingnumber;
+
+            // Log the incoming number
+            Log.d("INCOMING", phoneNumber);
+
+            // End the call
             telephonyService.endCall();
-            Log.d("HANG UP", incomingnumber);
+            Log.d("HANG UP", phoneNumber);
 
         } catch (Exception e) {
-            e.printStackTrace();
+            e.printStackTrace(); // Catch and print any exception that occurs
+        }*/
+        TelecomManager tm = (TelecomManager) context.getSystemService(Context.TELECOM_SERVICE);
+        if (tm != null) {
+            if (ActivityCompat.checkSelfPermission(context, android.Manifest.permission.ANSWER_PHONE_CALLS) != PackageManager.PERMISSION_GRANTED) {
+                // TODO: Consider calling
+                //    ActivityCompat#requestPermissions
+                // here to request the missing permissions, and then overriding
+                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                //                                          int[] grantResults)
+                // to handle the case where the user grants the permission. See the documentation
+                // for ActivityCompat#requestPermissions for more details.
+                return;
+            }
+            boolean success = tm.endCall();
+            // success == true if call was terminated.
         }
+
+
     }
 
 }
